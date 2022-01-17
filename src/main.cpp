@@ -1,24 +1,13 @@
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
+#include "Logger.h"
+#include "Log.h"
 
-using namespace sf;
+static Log deflog("Main");
 
 int main(int argc, char** argv) {
-  RenderWindow window({100, 100}, "Xonix");
+  Logger::instance().init(new LogImplement());
+  Logger::instance().setLevel(LogLevel::Debug);
 
-  while(window.isOpen()) {
-    Event ev;
-    while(window.pollEvent(ev)) {
-      switch(ev.type) {
-        case Event::Closed:
-          window.close();
-          break;
-        default: break;
-      }
-    }
-
-    window.clear();
-    window.draw(CircleShape(50, 32));
-    window.display();
-  }
+  lDebug(deflog) << "Project log init";
+  
+  return 0;
 }
