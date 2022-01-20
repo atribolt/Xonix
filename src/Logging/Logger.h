@@ -34,13 +34,14 @@ public:
   LogImplement* init(LogImplement* impl);
   void setLevel(LogLevel level);
 
-  void message(std::string const& name, std::string const& msg, 
+  void message(std::string const& name, std::string const& msg,
                LogLevel level, Time time);
   void debug(std::string const& name, std::string const& msg);
   void warning(std::string const& name, std::string const& msg);
   void error(std::string const& name, std::string const& msg);
   void info(std::string const& name, std::string const& msg);
-  
+
+  ~Logger();
 private:
   Logger();
   bool checkLevel(LogLevel level);

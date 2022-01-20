@@ -5,9 +5,6 @@
 
 #include "Logger.h"
 
-
-static std::mutex log_mutex;
-static std::thread log_thread;
 static LogImplement* implement;
 
 
@@ -31,7 +28,7 @@ void LogImplement::newMessage(const std::string& category, Time time, LogLevel l
       break;
   }
 
-  std::cout << time.time_since_epoch().count() << " [" << str_level << "] {" << category << "} " << msg << '\n';
+  std::cout << time.time_since_epoch().count() << " [" << str_level << "] {" << category << "} " << msg << std::endl;
 }
 
 Logger& Logger::instance()
@@ -52,9 +49,11 @@ void Logger::setLevel(LogLevel level)
   _filter = level;
 }
 
-void Logger::message(const std::string& name, const std::string& msg, 
+void Logger::message(const std::string& name, const std::string& msg,
                      LogLevel level, Time time)
 {
+  static std::mutex log_mutex;
+
   if (checkLevel(level) && implement) {
     std::lock_guard lock(log_mutex);
     implement->newMessage(name, time, level, msg);
@@ -79,6 +78,14 @@ void Logger::error(std::string const& name, const std::string& msg)
 void Logger::info(std::string const& name, const std::string& msg)
 {
   message(name, msg, LogLevel::Info, Clock::now());
+}
+
+Logger::~Logger()
+{
+  if (implement) {
+    delete implement;
+  }
+  implement = nullptr;
 }
 
 Logger::Logger()

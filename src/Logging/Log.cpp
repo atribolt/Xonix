@@ -22,7 +22,7 @@ Log::Log(Log const& other)
   swap(other);
 }
 
-Log& Log::operator=(Log const& other) 
+Log& Log::operator=(Log const& other)
 {
   swap(other);
   return *this;
@@ -31,26 +31,30 @@ Log& Log::operator=(Log const& other)
 Log::~Log()
 {
   if (_buffer.empty()) return;
-  
+
   using Func = void (Logger::*)(std::string const&, std::string const&);
   Func writeLog;
-  
+
   switch (_level) {
     case Log::Debug:
-      writeLog = &Logger::debug;
+      Logger::instance().debug(_name, _buffer);
+      //writeLog = &Logger::debug;
       break;
     case Log::Warning:
-      writeLog = &Logger::warning;
+      Logger::instance().warning(_name, _buffer);
+      //writeLog = &Logger::warning;
       break;
     case Log::Error:
-      writeLog = &Logger::error;
+      Logger::instance().error(_name, _buffer);
+      //writeLog = &Logger::error;
       break;
     case Log::Info:
-      writeLog = &Logger::info;
+      Logger::instance().info(_name, _buffer);
+      //writeLog = &Logger::info;
       break;
   }
-  
-  (Logger::instance().*writeLog)(_name, _buffer);
+
+  //(Logger::instance().*writeLog)(_name, _buffer);
 }
 
 Log Log::debug()
@@ -93,7 +97,7 @@ void Log::swap(const Log& other)
   std::swap(const_cast<Log&>(other)._level, _level);
 }
 
-Log operator<< (Log log, std::string const& message) 
+Log operator<< (Log log, std::string const& message)
 {
   log._buffer.append(" " + message);
   return log;
