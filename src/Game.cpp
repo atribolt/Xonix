@@ -1,19 +1,23 @@
 #include <thread>
+#include <string>
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include "Game.h"
-#include "Window.h"
 #include "Logging/Log.h"
 #include "GameSettings.h"
-#include "Engines/DrawEngine.h"
-#include "Engines/EventEngine.h"
-#include "Engines/AnimationEngine.h"
-#include "Engines/ObjectFactory.h"
+#include "Handlers/EventHandler.h"
+#include "Handlers/CloseHandler.h"
+#include "Handlers/PlayerController.h"
+#include "Handlers/EnemyCollision.h"
+
 
 static Log game("Game");
 
+
 Game::Game()
 {
+  _window = nullptr;
+  _exitRequest = false;
 }
 
 Game& Game::instance()
@@ -25,11 +29,17 @@ Game& Game::instance()
 Game::~Game()
 {
   exit();
+
+  delete _window;
+
+  for (EventHandler*& handler : _handlers) {
+    delete handler;
+  }
 }
 
 bool Game::loadConfig(const std::string& path)
 {
-  game.debug() << "Load config...";
+  game.debug() << "Load config";
   bool status = GameSettings::instance().loadConfig(path);
 
   if (!status)
@@ -38,55 +48,117 @@ bool Game::loadConfig(const std::string& path)
     return false;
   }
 
-  game.debug() << "Config is loaded...";
+  game.debug() << "Config is loaded";
   return true;
 }
 
 void Game::init()
 {
-  game.debug() << "Init game...";
-  Window::instance().init();
-  ObjectFactory::instance().init();
+  game.debug() << "Init game";
 
-  _engines.push_back(EnginePtr(new EventEngine()));
-  _engines.push_back(EnginePtr(new DrawEngine()));
-  _engines.push_back(EnginePtr(new AnimationEngine()));
+  GameSettings& setts = GameSettings::instance();
+  sf::VideoMode mode(setts.windowWidth(), setts.windowHeight());
 
-  for (EnginePtr& engine : _engines) {
-    engine->init();
+  _engine.reset();
+  _handlers.clear();
+  _exitRequest = false;
+  _map.init();
+
+  _map.layers.push_back({});
+  _map.layers.back().reserve(20);
+
+  Entity& player = _map.layers.back().emplace_back(Entity::Player, 0.3f);
+
+  srand(time(0));
+  for (int i = 0; i < 10; ++i) {
+    Entity* enemy = &(_map.layers.back().push_back({Entity::Enemy, 0.1f}), _map.layers.back().back());
+    enemy->left = rand() % (setts.windowWidth() - setts.cellWidth() * 4) + setts.cellWidth() * 2;
+    enemy->top = rand() % (setts.windowHeight() - setts.cellHeight() * 4) + setts.cellHeight() * 2;
+    enemy->speed = rand() % 100 / 200.f;
+    if (rand() % 4 > 2)
+      enemy->setDirection(Entity::Right);
+    else
+      enemy->setDirection(Entity::Up);
+
+    _engine.dinamycObjects.push_back(enemy);
   }
+
+  for (auto& entity: _map.layers[0]) {
+    _engine.staticObjects.push_back(&entity);
+  }
+
+  _engine.dinamycObjects.push_back(&player);
+  _handlers.push_back(new CloseHandler);
+
+  PlayerController* controller = new PlayerController(&player, &_map);
+  _handlers.push_back(dynamic_cast<EventHandler*>(controller));
+  _engine.handlers.push_back(dynamic_cast<CollisionHandler*>(controller));
+  _engine.handlers.push_back(new EnemyCollision);
+
+  _window = new sf::RenderWindow(mode, "Xonix", sf::Style::Close | sf::Style::Titlebar);
+  _window->setFramerateLimit(setts.maxFramerate());
+  _window->setVerticalSyncEnabled(true);
+  _window->setPosition({0, 0});
 }
 
 void Game::start()
 {
-  game.debug() << "Start game...";
-  Window::instance().open();
+  game.debug() << "Start game";
 
-  for (int i = 0; i < _engines.size() - 1; ++i) {
-    _engines[i]->asyncStart();
+  std::thread([this] () {
+    GameSettings& setts = GameSettings::instance();
+
+    while(_window->isOpen()) {
+      _engine.step();
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000 / setts.maxFramerate()));
+    }
+  }).detach();
+
+  using namespace std::chrono;
+  GameSettings& setts = GameSettings::instance();
+
+  _engine.start();
+
+  while(_window->isOpen()) {
+    sf::Event ev;
+    while (_window->pollEvent(ev)) {
+      for (EventHandler*& handler : _handlers) {
+        handler->handle(ev);
+      }
+    }
+
+    if (_exitRequest) {
+      _window->close();
+      break;
+    }
+
+    _window->clear();
+    _window->draw(_map);
+    _window->display();
   }
-
-  _engines.back()->syncStart();
 }
 
 void Game::exit()
 {
-  game.debug() << "Stoping all engines";
+  game.debug() << "Exit game";
+  _exitRequest = true;
+}
 
-  for (auto iter = _engines.rbegin(); iter != _engines.rend(); ++iter) {
-    (*iter)->stop();
-  }
+void Game::restart()
+{
+  _window->close();
 
-  game.debug() << "Wait for finished engines";
-  bool allStoped = false;
-  while (!allStoped) {
-    bool anyRunning = false;
-    for (EnginePtr& engine : _engines) {
-      anyRunning |= engine->isRunning();
-    }
+  delete _window;
 
-    allStoped = !anyRunning;
-  }
+  init();
+  start();
+}
 
-  Window::instance().close();
+void Game::gameOver()
+{
+  _engine.pause();
+
+  for (Entity& cell : _map.layers[0])
+    if (cell.type == Entity::LightBrick)
+      cell.type = Entity::Destroy;
 }

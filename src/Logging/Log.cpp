@@ -38,23 +38,17 @@ Log::~Log()
   switch (_level) {
     case Log::Debug:
       Logger::instance().debug(_name, _buffer);
-      //writeLog = &Logger::debug;
       break;
     case Log::Warning:
       Logger::instance().warning(_name, _buffer);
-      //writeLog = &Logger::warning;
       break;
     case Log::Error:
       Logger::instance().error(_name, _buffer);
-      //writeLog = &Logger::error;
       break;
     case Log::Info:
       Logger::instance().info(_name, _buffer);
-      //writeLog = &Logger::info;
       break;
   }
-
-  //(Logger::instance().*writeLog)(_name, _buffer);
 }
 
 Log Log::debug()

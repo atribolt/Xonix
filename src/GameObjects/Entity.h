@@ -1,22 +1,30 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <SFML/System/Vector2.hpp>
+#include "GameObjects/PhysObjects.h"
+#include "GameSettings.h"
 
-class Entity {
+class Entity final : public PhysObject {
 public:
-  enum Directions : char {
-    Up, 
-    Down,
-    Left,
-    Right
+  enum Type : char {
+    Brick,
+    LightBrick,
+    Enemy,
+    Player,
+    Destroy,
+    None
   };
-  
-  
-  
-  float speed;
-  Directions moveDirection;
-  sf::Vector2i pos;
+
+  Entity(Type t, float speed = 0.f)
+    : type(t)
+  {
+    width = GameSettings::instance().cellWidth();
+    height = GameSettings::instance().cellHeight();
+
+    this->speed = speed;
+  }
+
+  Type type;
 };
 
-#endif // ENTITY_H
+#endif // PLAYER_H

@@ -12,6 +12,8 @@ public:
   int windowWidth() const;
   int windowHeight() const;
   int maxFramerate() const;
+  int cellWidth() const;
+  int cellHeight() const;
   const std::string& windowTitle() const;
 
 private:

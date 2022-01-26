@@ -6,15 +6,15 @@
 class Log {
 public:
   Log(std::string const& name);
-  
+
   Log(Log&& other);
   Log&& operator=(Log&& other);
-  
+
   Log(Log const& other);
   Log& operator=(Log const& other);
-  
+
   ~Log();
-  
+
   Log debug();
   Log warning();
   Log error();
@@ -27,16 +27,16 @@ private:
     Error,
     Info
   };
-  
+
   Log(std::string const& name, LogLevel level);
-  
+
   void swap(Log&& other);
   void swap(Log const& other);
-  
+
   LogLevel _level;
   std::string _name;
   std::string _buffer;
-  
+
   friend Log operator<< (Log log, std::string const& message);
 };
 

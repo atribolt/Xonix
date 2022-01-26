@@ -1,15 +1,5 @@
 set (ENGINES
-  Engines/Engine.h
-  Engines/DrawEngine.h
-  Engines/EventEngine.h
-  Engines/ObjectFactory.h
-  Engines/AnimationEngine.h
-
-  Engines/Engine.cpp
-  Engines/DrawEngine.cpp
-  Engines/EventEngine.cpp
-  Engines/ObjectFactory.cpp
-  Engines/AnimationEngine.cpp
+  Engines/MoveEngine.h
 )
 
 set (LOGGING
@@ -20,35 +10,26 @@ set (LOGGING
 )
 
 set (GAMEOBJECTS
-  GameObjects/Map.h
-  GameObjects/Block.h
   GameObjects/Entity.h
-  GameObjects/Player.h
-  GameObjects/Animation.h
-  GameObjects/GameObject.h
-
-  GameObjects/Map.cpp
-  GameObjects/GameObject.cpp
+  GameObjects/PhysObjects.h
+  GameObjects/Map.h
 )
 
 set (EVENTHANDLERS
-  EventHandlers/ExitGame.h
-  EventHandlers/EventHandler.h
-  EventHandlers/PlayerController.h
-
-  EventHandlers/ExitGame.cpp
-  EventHandlers/PlayerController.cpp
+  Handlers/CloseHandler.h
+  Handlers/EventHandler.h
+  Handlers/CollisionHandler.h
+  Handlers/PlayerController.h
+  Handlers/EnemyCollision.h
 )
 
 set (SRC
   Game.h
-  Window.h
   Classes.h
   GameSettings.h
 
   Game.cpp
   GameSettings.cpp
-  Window.cpp
   main.cpp
 )
 

@@ -61,9 +61,9 @@ bool GameSettings::loadConfig(const std::string& configPath)
     }
   }
 
-  this->_windowWidth = std::max(this->_windowWidth, 640);
-  this->_windowHeight = std::max(this->_windowWidth, 420);
-  this->_maxFramerate = std::max(this->_maxFramerate, 24);
+  this->_windowWidth = std::max(this->_windowWidth, 1900);
+  this->_windowHeight = std::max(this->_windowHeight, 1000);
+  this->_maxFramerate = std::max(this->_maxFramerate, 60);
   this->_windowTitle = "Xonix";
 
   return true;
@@ -82,6 +82,16 @@ int GameSettings::windowHeight() const
 int GameSettings::maxFramerate() const
 {
   return _maxFramerate;
+}
+
+int GameSettings::cellWidth() const
+{
+  return 10;
+}
+
+int GameSettings::cellHeight() const
+{
+  return 10;
 }
 
 const std::string& GameSettings::windowTitle() const

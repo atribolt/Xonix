@@ -2,3 +2,7 @@
 	path = external/SFML
 	url = https://github.com/SFML/SFML.git
 	branch = 2.5.x
+[submodule "Box2d"]
+	path = external/Box2d
+	url = https://github.com/erincatto/box2d-lite.git
+	branch = master
