@@ -2,37 +2,33 @@
 #define GMAE_H
 
 
-#include <string>
-#include <vector>
+#include "Interface/GameState.h"
 
-#include "GameObjects/Map.h"
-#include "Engines/MoveEngine.h"
+class GameEvent;
 
-namespace sf { class RenderWindow; }
-
-
-class Game {
-public:
-  static Game& instance();
-  ~Game();
-
-  bool loadConfig(const std::string& path);
-  void init();
-  void start();
-  void exit();
-
-  void restart();
-  void gameOver();
-
+class Game final : public sf::Drawable {
 private:
   Game();
 
-  bool _exitRequest;
+public:
+  ~Game();
 
-  Map _map;
-  MoveEngine _engine;
-  sf::RenderWindow* _window;
-  std::vector<class EventHandler*> _handlers;
+  static Game& instance();
+
+  bool isOpen() const;
+  void event(sf::Event const& ev);
+  void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+  void gameEvent(const GameEvent& ev);
+  void exit();
+
+private:
+  GameState*& state(GameState::Type state);
+
+private:
+  bool _exited {false};
+
+  GameState* _currentState {nullptr};
+  std::vector<GameState*> _states;
 };
 
 #endif // GMAE_H

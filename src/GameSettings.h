@@ -2,6 +2,7 @@
 #define GAMESETTINGS_H
 
 #include <string>
+#include <SFML/Graphics/Font.hpp>
 
 class GameSettings {
 public:
@@ -14,6 +15,7 @@ public:
   int maxFramerate() const;
   int cellWidth() const;
   int cellHeight() const;
+  const sf::Font& font() const;
   const std::string& windowTitle() const;
 
 private:
@@ -22,6 +24,9 @@ private:
   int _windowWidth;
   int _windowHeight;
   int _maxFramerate;
+  int _cellWidth;
+  int _cellHeight;
+  sf::Font _font;
   std::string _windowTitle;
 };
 

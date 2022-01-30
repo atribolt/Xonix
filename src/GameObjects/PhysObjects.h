@@ -5,7 +5,10 @@
 
 class PhysObject : public sf::FloatRect {
 public:
-  virtual ~PhysObject() {}
+  enum Type {
+    Static,
+    Dynamic
+  };
 
   enum Direction : char {
     Stoped = 0,
@@ -14,6 +17,15 @@ public:
     Left = 2,
     Right = 4
   };
+
+  PhysObject(Type type = Static, float speed = 0.f, Direction dir = Stoped)
+    : objType(type)
+    , speed(speed)
+  {
+    setDirection(dir);
+  }
+awe
+  virtual ~PhysObject() {}
 
   void setDirection(Direction dir) {
     switch(dir) {
@@ -45,11 +57,13 @@ public:
     return { left + width / 2.f, top + height / 2.f };
   }
 
+
   void move(const sf::Vector2f& pos) {
     left += pos.x;
     top += pos.y;
   }
 
+  Type objType;
   float speed {0.f};
   sf::Vector2f direction {0, 0};
 };
