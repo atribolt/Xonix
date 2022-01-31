@@ -61,10 +61,13 @@ bool GameSettings::loadConfig(const std::string& configPath)
     }
   }
 
-  this->_windowWidth = std::max(this->_windowWidth, 1900);
-  this->_windowHeight = std::max(this->_windowHeight, 1000);
-  this->_maxFramerate = std::max(this->_maxFramerate, 60);
+  this->_windowWidth = std::max(this->_windowWidth, 640);
+  this->_windowHeight = std::max(this->_windowHeight, 420);
+  this->_maxFramerate = std::max(this->_maxFramerate, 30);
   this->_windowTitle = "Xonix";
+  this->_cellWidth = 10;
+  this->_cellHeight = 10;
+  this->_font.loadFromFile("font.ttf");
 
   return true;
 }
@@ -86,12 +89,17 @@ int GameSettings::maxFramerate() const
 
 int GameSettings::cellWidth() const
 {
-  return 10;
+  return _cellWidth;
 }
 
 int GameSettings::cellHeight() const
 {
-  return 10;
+  return _cellHeight;
+}
+
+const sf::Font& GameSettings::font() const
+{
+  return _font;
 }
 
 const std::string& GameSettings::windowTitle() const

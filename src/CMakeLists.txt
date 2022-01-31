@@ -1,7 +1,3 @@
-set (ENGINES
-  Engines/MoveEngine.h
-)
-
 set (LOGGING
   Logging/Log.h
   Logging/Log.cpp
@@ -9,23 +5,20 @@ set (LOGGING
   Logging/Logger.cpp
 )
 
-set (GAMEOBJECTS
-  GameObjects/Entity.h
-  GameObjects/PhysObjects.h
-  GameObjects/Map.h
+set (INTERFACE
+  Interface/GameState.h
+  Interface/GameState.cpp
 )
 
-set (EVENTHANDLERS
-  Handlers/CloseHandler.h
-  Handlers/EventHandler.h
-  Handlers/CollisionHandler.h
-  Handlers/PlayerController.h
-  Handlers/EnemyCollision.h
+set (GAMESTATES
+  GameStates/MenuState.h
+  GameStates/InPlayState.h
+  GameStates/GameOverState.h
 )
 
 set (SRC
   Game.h
-  Classes.h
+  GameEvent.h
   GameSettings.h
 
   Game.cpp
@@ -34,19 +27,17 @@ set (SRC
 )
 
 list(APPEND SRC_FILES
-  ${ENGINES}
   ${LOGGING}
   ${SRC}
-  ${GAMEOBJECTS}
-  ${EVENTHANDLERS}
+  ${INTERFACE}
+  ${GAMESTATES}
 )
 
 message(STATUS ${SRC_FILES})
 
-source_group("Engines" FILES ${ENGINES})
 source_group("Logging" FILES ${LOGGING})
-source_group("Game Objects" FILES ${GAMEOBJECTS})
-source_group("Event Handlers" FILES ${EVENTHANDLERS})
+source_group("Interface" FILES ${INTERFACE})
+source_group("Game States" FILES ${GAMESTATES})
 source_group("src" FILES ${SRC})
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
